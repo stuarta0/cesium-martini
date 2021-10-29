@@ -19,7 +19,8 @@ function mapboxTerrainToGrid(png: ndarray<number>, interval?: number, offset?: n
       const r = png.get(x, yc, 0);
       const g = png.get(x, yc, 1);
       const b = png.get(x, yc, 2);
-      terrain[y * gridSize + x] =
+      const a = png.get(x, yc, 3);
+      terrain[y * gridSize + x] = a < 255 ? 0 :
         (r * 256 * 256) * interval + (g * 256.0) * interval + b * interval + offset;
     }
   }
