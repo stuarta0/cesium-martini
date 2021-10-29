@@ -1,5 +1,7 @@
 'use strict';
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
 var cesium = require('cesium');
 
 function ownKeys(object, enumerableOnly) {
@@ -113,6 +115,87 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  } else if (call !== void 0) {
+    throw new TypeError("Derived constructors may only return object or undefined");
+  }
+
+  return _assertThisInitialized(self);
+}
+
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived),
+        result;
+
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+
+    return _possibleConstructorReturn(this, result);
+  };
+}
+
 function _toConsumableArray(arr) {
   return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
 }
@@ -145,6 +228,194 @@ function _arrayLikeToArray(arr, len) {
 function _nonIterableSpread() {
   throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
+
+var loadImage = function loadImage(url) {
+  return new Promise(function (resolve, reject) {
+    var img = new Image();
+    img.addEventListener("load", function () {
+      return resolve(img);
+    });
+    img.addEventListener("error", function (err) {
+      return reject(err);
+    });
+    img.crossOrigin = "anonymous";
+    img.src = url;
+  });
+};
+
+var DefaultHeightmapResource = /*#__PURE__*/function () {
+  function DefaultHeightmapResource() {
+    var _this = this,
+        _opts$skipOddLevels,
+        _opts$tileSize,
+        _opts$maxZoom;
+
+    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, DefaultHeightmapResource);
+
+    _defineProperty(this, "resource", null);
+
+    _defineProperty(this, "tileSize", 256);
+
+    _defineProperty(this, "maxZoom", void 0);
+
+    _defineProperty(this, "skipOddLevels", false);
+
+    _defineProperty(this, "contextQueue", void 0);
+
+    _defineProperty(this, "getTilePixels", /*#__PURE__*/function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(coords) {
+        var url, img;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                url = _this.buildTileURL(coords);
+                _context.next = 3;
+                return loadImage(url);
+
+              case 3:
+                img = _context.sent;
+                return _context.abrupt("return", _this.getPixels(img));
+
+              case 5:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }));
+
+      return function (_x) {
+        return _ref.apply(this, arguments);
+      };
+    }());
+
+    if (opts.url) {
+      this.resource = cesium.Resource.createIfNeeded(opts.url);
+    }
+
+    this.skipOddLevels = (_opts$skipOddLevels = opts.skipOddLevels) !== null && _opts$skipOddLevels !== void 0 ? _opts$skipOddLevels : false;
+    this.tileSize = (_opts$tileSize = opts.tileSize) !== null && _opts$tileSize !== void 0 ? _opts$tileSize : 256;
+    this.maxZoom = (_opts$maxZoom = opts.maxZoom) !== null && _opts$maxZoom !== void 0 ? _opts$maxZoom : 15;
+    this.contextQueue = [];
+  }
+
+  _createClass(DefaultHeightmapResource, [{
+    key: "getCanvas",
+    value: function getCanvas() {
+      var ctx = this.contextQueue.pop();
+
+      if (ctx == null) {
+        var canvas = document.createElement("canvas");
+        canvas.width = this.tileSize;
+        canvas.height = this.tileSize;
+        var context = canvas.getContext("2d");
+        ctx = {
+          canvas: canvas,
+          context: context
+        };
+      }
+
+      return ctx;
+    }
+  }, {
+    key: "getPixels",
+    value: function getPixels(img) {
+      var canvasRef = this.getCanvas();
+      var context = canvasRef.context; //context.scale(1, -1);
+      // Chrome appears to vertically flip the image for reasons that are unclear
+      // We can make it work in Chrome by drawing the image upside-down at this step.
+
+      context.drawImage(img, 0, 0, this.tileSize, this.tileSize);
+      var pixels = context.getImageData(0, 0, this.tileSize, this.tileSize);
+      context.clearRect(0, 0, this.tileSize, this.tileSize);
+      this.contextQueue.push(canvasRef);
+      return pixels;
+    }
+  }, {
+    key: "buildTileURL",
+    value: function buildTileURL(tileCoords) {
+      var _this$resource;
+
+      // reverseY for TMS tiling (https://gist.github.com/tmcw/4954720)
+      // See tiling schemes here: https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/
+      var z = tileCoords.z,
+          y = tileCoords.y;
+      return (_this$resource = this.resource) === null || _this$resource === void 0 ? void 0 : _this$resource.getDerivedResource({
+        templateValues: _objectSpread2(_objectSpread2({}, tileCoords), {}, {
+          reverseY: Math.pow(2, z) - y - 1
+        }),
+        preserveQueryParameters: true
+      }).getUrlComponent(true);
+    }
+  }, {
+    key: "getTileDataAvailable",
+    value: function getTileDataAvailable(_ref2) {
+      var z = _ref2.z;
+      if (z == this.maxZoom) return true;
+      if (z % 2 == 1 && this.skipOddLevels) return false;
+      if (z > this.maxZoom) return false;
+      return true;
+    }
+  }]);
+
+  return DefaultHeightmapResource;
+}();
+
+var ImageFormat;
+
+(function (ImageFormat) {
+  ImageFormat["WEBP"] = "webp";
+  ImageFormat["PNG"] = "png";
+  ImageFormat["PNGRAW"] = "pngraw";
+})(ImageFormat || (ImageFormat = {}));
+
+var MapboxTerrainResource = /*#__PURE__*/function (_DefaultHeightmapReso) {
+  _inherits(MapboxTerrainResource, _DefaultHeightmapReso);
+
+  var _super = _createSuper(MapboxTerrainResource);
+
+  function MapboxTerrainResource() {
+    var _opts$highResolution, _opts$imageFormat;
+
+    var _this;
+
+    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, MapboxTerrainResource);
+
+    _this = _super.call(this, opts);
+
+    _defineProperty(_assertThisInitialized(_this), "resource", null);
+
+    var highResolution = (_opts$highResolution = opts.highResolution) !== null && _opts$highResolution !== void 0 ? _opts$highResolution : false;
+    var format = (_opts$imageFormat = opts.imageFormat) !== null && _opts$imageFormat !== void 0 ? _opts$imageFormat : ImageFormat.WEBP; // overrides based on highResolution flag
+
+    if (highResolution) {
+      if (opts.maxZoom === undefined) {
+        _this.maxZoom = 14;
+      }
+
+      if (opts.tileSize === undefined) {
+        _this.tileSize = 512;
+      }
+    }
+
+    _this.resource = cesium.Resource.createIfNeeded("https://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}".concat(highResolution ? "@2x" : "", ".").concat(format));
+
+    if (opts.accessToken) {
+      _this.resource.setQueryParameters({
+        access_token: opts.accessToken
+      });
+    }
+
+    return _this;
+  }
+
+  return MapboxTerrainResource;
+}(DefaultHeightmapResource);
 
 function decodeBase64(base64, enableUnicode) {
     var binaryString = atob(base64);
@@ -1748,33 +2019,11 @@ self.onmessage = function (msg) {
 };
 
 require("ndarray");
-// https://github.com/CesiumGS/cesium/blob/1.68/Source/Scene/MapboxImageryProvider.js#L42
-var ImageFormat;
-
-(function (ImageFormat) {
-  ImageFormat["WEBP"] = "webp";
-  ImageFormat["PNG"] = "png";
-  ImageFormat["PNGRAW"] = "pngraw";
-})(ImageFormat || (ImageFormat = {}));
-
-var loadImage = function loadImage(url) {
-  return new Promise(function (resolve, reject) {
-    var img = new Image();
-    img.addEventListener("load", function () {
-      return resolve(img);
-    });
-    img.addEventListener("error", function (err) {
-      return reject(err);
-    });
-    img.crossOrigin = "anonymous";
-    img.src = url;
-  });
-};
 
 var MartiniTerrainProvider = /*#__PURE__*/function () {
   // @ts-ignore
   function MartiniTerrainProvider() {
-    var _opts$highResolution, _opts$skipOddLevels, _opts$maxZoom, _opts$interval, _opts$offset, _opts$useWorkers, _opts$detailScalar, _opts$minimumErrorLev, _opts$ellipsoid, _opts$format;
+    var _opts$interval, _opts$offset, _opts$maxWorkers, _opts$detailScalar, _opts$minimumErrorLev, _opts$ellipsoid;
 
     var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
@@ -1798,25 +2047,13 @@ var MartiniTerrainProvider = /*#__PURE__*/function () {
 
     _defineProperty(this, "ellipsoid", void 0);
 
-    _defineProperty(this, "accessToken", void 0);
-
-    _defineProperty(this, "format", void 0);
-
-    _defineProperty(this, "highResolution", void 0);
-
-    _defineProperty(this, "tileSize", 256);
-
     _defineProperty(this, "workerFarm", null);
 
     _defineProperty(this, "inProgressWorkers", 0);
 
     _defineProperty(this, "levelOfDetailScalar", null);
 
-    _defineProperty(this, "useWorkers", true);
-
-    _defineProperty(this, "skipOddLevels", false);
-
-    _defineProperty(this, "contextQueue", void 0);
+    _defineProperty(this, "maxWorkers", 5);
 
     _defineProperty(this, "minError", 0.1);
 
@@ -1826,38 +2063,22 @@ var MartiniTerrainProvider = /*#__PURE__*/function () {
 
     _defineProperty(this, "offset", void 0);
 
-    _defineProperty(this, "maxZoom", void 0);
-
     _defineProperty(this, "RADIUS_SCALAR", 1.0);
 
     //this.martini = new Martini(257);
-    // highResolution could be removed and simply provided in a templated uri during instantiation
-    this.resource = cesium.Resource.createIfNeeded(cesium.defaultValue(opts.url, 'https://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}{highResolution}.{format}'));
-    this.highResolution = (_opts$highResolution = opts.highResolution) !== null && _opts$highResolution !== void 0 ? _opts$highResolution : false;
-    this.skipOddLevels = (_opts$skipOddLevels = opts.skipOddLevels) !== null && _opts$skipOddLevels !== void 0 ? _opts$skipOddLevels : false;
-    this.tileSize = this.highResolution ? 512 : 256;
-    this.maxZoom = (_opts$maxZoom = opts.maxZoom) !== null && _opts$maxZoom !== void 0 ? _opts$maxZoom : 15;
+    this.resource = opts.resource;
     this.interval = (_opts$interval = opts.interval) !== null && _opts$interval !== void 0 ? _opts$interval : 0.1;
     this.offset = (_opts$offset = opts.offset) !== null && _opts$offset !== void 0 ? _opts$offset : -10000;
-    this.useWorkers = (_opts$useWorkers = opts.useWorkers) !== null && _opts$useWorkers !== void 0 ? _opts$useWorkers : true;
-    this.contextQueue = [];
+    this.maxWorkers = (_opts$maxWorkers = opts.maxWorkers) !== null && _opts$maxWorkers !== void 0 ? _opts$maxWorkers : 5;
     this.levelOfDetailScalar = ((_opts$detailScalar = opts.detailScalar) !== null && _opts$detailScalar !== void 0 ? _opts$detailScalar : 4.0) + cesium.Math.EPSILON5;
     this.ready = true;
     this.readyPromise = Promise.resolve(true);
-    this.accessToken = opts.accessToken;
     this.minError = (_opts$minimumErrorLev = opts.minimumErrorLevel) !== null && _opts$minimumErrorLev !== void 0 ? _opts$minimumErrorLev : 0.1;
     this.errorEvent.addEventListener(console.log, this);
     this.ellipsoid = (_opts$ellipsoid = opts.ellipsoid) !== null && _opts$ellipsoid !== void 0 ? _opts$ellipsoid : cesium.Ellipsoid.WGS84;
-    this.format = (_opts$format = opts.format) !== null && _opts$format !== void 0 ? _opts$format : ImageFormat.WEBP;
 
-    if (this.useWorkers) {
+    if (this.maxWorkers > 0) {
       this.workerFarm = new WorkerFarm();
-    }
-
-    if (this.accessToken) {
-      this.resource.setQueryParameters({
-        access_token: this.accessToken
-      });
     }
 
     this.tilingScheme = new cesium.WebMercatorTilingScheme({
@@ -1868,61 +2089,11 @@ var MartiniTerrainProvider = /*#__PURE__*/function () {
   }
 
   _createClass(MartiniTerrainProvider, [{
-    key: "getCanvas",
-    value: function getCanvas() {
-      var ctx = this.contextQueue.pop();
-
-      if (ctx == null) {
-        var canvas = document.createElement("canvas");
-        canvas.width = this.tileSize;
-        canvas.height = this.tileSize;
-        var context = canvas.getContext("2d");
-        ctx = {
-          canvas: canvas,
-          context: context
-        };
-      }
-
-      return ctx;
-    }
-  }, {
-    key: "getPixels",
-    value: function getPixels(img) {
-      var canvasRef = this.getCanvas();
-      var context = canvasRef.context; //context.scale(1, -1);
-      // Chrome appears to vertically flip the image for reasons that are unclear
-      // We can make it work in Chrome by drawing the image upside-down at this step.
-
-      context.drawImage(img, 0, 0, this.tileSize, this.tileSize);
-      var pixels = context.getImageData(0, 0, this.tileSize, this.tileSize);
-      context.clearRect(0, 0, this.tileSize, this.tileSize);
-      this.contextQueue.push(canvasRef);
-      return pixels;
-    }
-  }, {
-    key: "buildTileURL",
-    value: function buildTileURL(tileCoords) {
-      // SKU token generation code: https://github.com/mapbox/mapbox-gl-js/blob/79f594fab76d932ccea0f171709718568af660e3/src/util/sku_token.js#L23
-      // reverseY for TMS tiling (https://gist.github.com/tmcw/4954720)
-      // See tiling schemes here: https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/
-      var z = tileCoords.z,
-          y = tileCoords.y;
-      return this.resource.getDerivedResource({
-        templateValues: _objectSpread2(_objectSpread2({}, tileCoords), {}, {
-          reverseY: Math.pow(2, z) - y - 1,
-          format: this.format,
-          highResolution: this.highResolution ? "@2x" : ""
-        }),
-        preserveQueryParameters: true
-      }).getUrlComponent(true);
-    }
-  }, {
     key: "requestTileGeometry",
     value: function requestTileGeometry(x, y, z, request) {
       var _this = this;
 
-      var maxWorkers = this.highResolution ? 2 : 5;
-      if (this.inProgressWorkers > maxWorkers) return undefined;
+      if (this.inProgressWorkers > this.maxWorkers) return undefined;
       this.inProgressWorkers += 1;
       return this.processTile(x, y, z)["finally"](function () {
         _this.inProgressWorkers -= 1;
@@ -1932,7 +2103,8 @@ var MartiniTerrainProvider = /*#__PURE__*/function () {
     key: "processTile",
     value: function () {
       var _processTile = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(x, y, z) {
-        var err, url, image, px, pixelData, tileRect, maxLength, params, res, v;
+        var err, _this$resource, tileSize, getTilePixels, px, pixelData, tileRect, maxLength, params, res, v;
+
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -1942,20 +2114,19 @@ var MartiniTerrainProvider = /*#__PURE__*/function () {
                 //const url = `https://a.tiles.mapbox.com/v4/mapbox.terrain-rgb/${z}/${x}/${y}${hires}.${this.format}?access_token=${this.accessToken}`;
                 err = this.getErrorLevel(z);
                 _context.prev = 1;
-                url = this.buildTileURL({
+                _this$resource = this.resource, tileSize = _this$resource.tileSize, getTilePixels = _this$resource.getTilePixels;
+                _context.next = 5;
+                return getTilePixels({
                   x: x,
                   y: y,
                   z: z
                 });
-                _context.next = 5;
-                return loadImage(url);
 
               case 5:
-                image = _context.sent;
-                px = this.getPixels(image);
+                px = _context.sent;
                 pixelData = px.data;
                 tileRect = this.tilingScheme.tileXYToRectangle(x, y, z);
-                maxLength = Math.min(Math.round(this.tileSize / 32) * (z + 1), this.tileSize);
+                maxLength = Math.min(Math.round(tileSize / 32) * (z + 1), tileSize);
                 params = {
                   imageData: pixelData,
                   maxLength: maxLength,
@@ -1964,47 +2135,46 @@ var MartiniTerrainProvider = /*#__PURE__*/function () {
                   z: z,
                   errorLevel: err,
                   ellipsoidRadius: this.ellipsoid.maximumRadius,
-                  tileSize: this.tileSize,
+                  tileSize: tileSize,
                   interval: this.interval,
                   offset: this.offset
                 };
 
                 if (!(this.workerFarm != null)) {
-                  _context.next = 17;
+                  _context.next = 16;
                   break;
                 }
 
-                _context.next = 14;
+                _context.next = 13;
                 return this.workerFarm.scheduleTask(params, [pixelData.buffer]);
 
-              case 14:
+              case 13:
                 res = _context.sent;
-                _context.next = 18;
+                _context.next = 17;
                 break;
 
-              case 17:
+              case 16:
                 res = decodeTerrain(params);
 
-              case 18:
+              case 17:
                 pixelData = undefined;
-                image = undefined;
                 px = undefined;
                 return _context.abrupt("return", this.createQuantizedMeshData(tileRect, err, res));
 
-              case 24:
-                _context.prev = 24;
+              case 22:
+                _context.prev = 22;
                 _context.t0 = _context["catch"](1);
                 console.log(_context.t0); // return undefined
 
                 v = Math.max(32 - 4 * z, 4);
                 return _context.abrupt("return", this.emptyHeightmap(v));
 
-              case 29:
+              case 27:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, this, [[1, 24]]);
+        }, _callee, this, [[1, 22]]);
       }));
 
       function processTile(_x, _x2, _x3) {
@@ -2085,22 +2255,25 @@ var MartiniTerrainProvider = /*#__PURE__*/function () {
       var levelZeroMaximumGeometricError = cesium.TerrainProvider.getEstimatedLevelZeroGeometricErrorForAHeightmap(this.tilingScheme.ellipsoid, 65, this.tilingScheme.getNumberOfXTilesAtLevel(0)); // Scalar to control overzooming
       // also seems to control zooming for imagery layers
 
-      var scalar = this.highResolution ? 2 : 1;
+      var scalar = this.resource.tileSize / 256;
       return levelZeroMaximumGeometricError / scalar / (1 << level);
     }
   }, {
     key: "getTileDataAvailable",
     value: function getTileDataAvailable(x, y, z) {
-      var maxZoom = this.highResolution ? this.maxZoom - 1 : this.maxZoom;
-      if (z == maxZoom) return true;
-      if (z % 2 == 1 && this.skipOddLevels) return false;
-      if (z > maxZoom) return false;
-      return true;
+      return this.resource.getTileDataAvailable({
+        x: x,
+        y: y,
+        z: z
+      });
     }
   }]);
 
   return MartiniTerrainProvider;
 }();
 
-module.exports = MartiniTerrainProvider;
+exports.DefaultHeightmapResource = DefaultHeightmapResource;
+exports.MapboxTerrainResource = MapboxTerrainResource;
+exports.MartiniTerrainProvider = MartiniTerrainProvider;
+exports["default"] = MartiniTerrainProvider;
 //# sourceMappingURL=index.js.map
