@@ -44,8 +44,8 @@ function handleMessage(msg) {
 
 class WorkerFarm {
   worker: Worker;
-  constructor() {
-    this.worker = new TerrainWorker();
+  constructor(opts) {
+    this.worker = opts.worker ?? new TerrainWorker();
     this.worker.onmessage = handleMessage;
   }
 

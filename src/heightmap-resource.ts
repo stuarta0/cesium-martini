@@ -1,7 +1,8 @@
-import { Resource } from "cesium";
+import { Resource, Credit } from "cesium";
 import { TileCoordinates } from "./terrain-provider";
 
 export interface HeightmapResource {
+  credit?: Credit;
   tileSize: number;
   getTilePixels: (coords: TileCoordinates) => Promise<ImageData>;
   getTileDataAvailable: (coords: TileCoordinates) => boolean;

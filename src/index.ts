@@ -1,10 +1,15 @@
 import DefaultHeightmapResource from './heightmap-resource'
 import MapboxTerrainResource from './mapbox-resource'
-import MartiniTerrainProvider from './terrain-provider'
+import WorkerFarmTerrainDecoder from './decoder';
+import MapboxTerrainProvider, { MartiniTerrainProvider } from './terrain-provider'
+import { createQuantizedMeshData, mapboxTerrainToGrid } from './worker-util';
 
-export default MartiniTerrainProvider
+export default MapboxTerrainProvider
 export {
     MartiniTerrainProvider,
     DefaultHeightmapResource,
-    MapboxTerrainResource
+    MapboxTerrainResource,
+    WorkerFarmTerrainDecoder,
+    mapboxTerrainToGrid,
+    createQuantizedMeshData,
 }

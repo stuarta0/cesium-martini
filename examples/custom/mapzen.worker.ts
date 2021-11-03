@@ -1,27 +1,18 @@
 import {
   mapboxTerrainToGrid,
   createQuantizedMeshData,
-  QuantizedMeshOptions,
-} from "./worker-util";
+} from "../../dist";
 import ndarray from "ndarray";
-import Martini from "../martini/index.js";
+import Martini from "../../martini/index.js";
 import "regenerator-runtime";
-// https://github.com/CesiumGS/cesium/blob/1.76/Source/WorkersES6/createVerticesFromQuantizedTerrainMesh.js
 
-export interface TerrainWorkerInput extends QuantizedMeshOptions {
-  imageData: Uint8ClampedArray;
-  maxLength: number | null;
-  x: number;
-  y: number;
-  z: number;
-}
+const ctx: Worker = self as any;
 
 let martini = null;
 
-function decodeTerrain(
-  parameters: TerrainWorkerInput,
-  transferableObjects: any[]
-) {
+const terrariumDecodeRgb = (r, g, b, a) => (r * 256) + g + (b / 256) - 32768;
+
+function decodeTerrain(parameters) {
   const { imageData, tileSize = 256, errorLevel } = parameters;
 
   const pixels = ndarray(
@@ -32,9 +23,9 @@ function decodeTerrain(
   );
 
   // Tile size must be maintained through the life of the worker
-  martini ??= new Martini(tileSize + 1);
+  martini = martini ?? new Martini(tileSize + 1);
 
-  const terrain = mapboxTerrainToGrid(pixels);
+  const terrain = mapboxTerrainToGrid(pixels, terrariumDecodeRgb);
 
   const tile = martini.createTile(terrain);
 
@@ -43,9 +34,7 @@ function decodeTerrain(
   return createQuantizedMeshData(tile, mesh, tileSize);
 }
 
-export { decodeTerrain };
-
-self.onmessage = function (msg) {
+ctx.addEventListener("message", (msg) => {
   const { id, payload } = msg.data;
   if (id == null) return;
   let objects = [];
@@ -54,11 +43,13 @@ self.onmessage = function (msg) {
     res = decodeTerrain(payload);
     objects.push(res.indices.buffer);
     objects.push(res.quantizedVertices.buffer);
-    self.postMessage({ id, payload: res }, objects);
+    ctx.postMessage({ id, payload: res }, objects);
   } catch (err) {
-    self.postMessage({ id, err: err.toString() });
+    ctx.postMessage({ id, err: err.toString() });
   } finally {
     res = null;
     objects = null;
   }
-};
+});
+
+export default null as any;
