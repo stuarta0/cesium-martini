@@ -13,7 +13,7 @@ interface CanvasRef {
   context: CanvasRenderingContext2D;
 }
 
-const loadImage: (url: string) => Promise<HTMLImageElement> = (url) =>
+export const loadImage: (url: string) => Promise<HTMLImageElement> = (url) =>
   new Promise((resolve, reject) => {
     const img = new Image();
     img.addEventListener("load", () => resolve(img));
@@ -61,24 +61,31 @@ export class DefaultHeightmapResource implements HeightmapResource {
     return ctx;
   }
 
-  getPixels(img: HTMLImageElement | HTMLCanvasElement): ImageData {
+  getPixels(img: HTMLImageElement | HTMLCanvasElement | HTMLImageElement[] | HTMLCanvasElement[]): ImageData {
     const canvasRef = this.getCanvas();
     const { context } = canvasRef;
+
+    let imgs: Array<HTMLImageElement | HTMLCanvasElement>;
+    if (Array.isArray(img)) {
+      imgs = img;
+    } else {
+      imgs = [img];
+    }
     //context.scale(1, -1);
     // Chrome appears to vertically flip the image for reasons that are unclear
     // We can make it work in Chrome by drawing the image upside-down at this step.
-    context.drawImage(img, 0, 0, this.tileSize, this.tileSize);
+    imgs.forEach(img => context.drawImage(img, 0, 0, this.tileSize, this.tileSize));
     const pixels = context.getImageData(0, 0, this.tileSize, this.tileSize);
     context.clearRect(0, 0, this.tileSize, this.tileSize);
     this.contextQueue.push(canvasRef);
     return pixels;
   }
 
-  buildTileURL(tileCoords: TileCoordinates) {
+  buildTileURL(tileCoords: TileCoordinates, resource?: Resource) {
     // reverseY for TMS tiling (https://gist.github.com/tmcw/4954720)
     // See tiling schemes here: https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/
     const { z, y } = tileCoords;
-    return this.resource?.getDerivedResource({
+    return resource?.getDerivedResource({
       templateValues: {
         ...tileCoords,
         reverseY: Math.pow(2, z) - y - 1,
@@ -88,7 +95,7 @@ export class DefaultHeightmapResource implements HeightmapResource {
   }
 
   getTilePixels = async (coords: TileCoordinates) => {
-    const url = this.buildTileURL(coords);
+    const url = this.buildTileURL(coords, this.resource);
     let img = await loadImage(url);
     return this.getPixels(img);
   }
