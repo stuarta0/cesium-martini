@@ -42,7 +42,7 @@ import Resource from "cesium/Source/Core/Resource";
 import DefaultHeightmapResource, { DefaultHeightmapResourceOpts, loadImage } from "./heightmap-resource";
 import { TileCoordinates } from "../terrain-provider";
 
-interface CompositeHeightmapResourceOpts extends Omit<DefaultHeightmapResourceOpts, "url"> {
+export interface CompositeHeightmapResourceOpts extends Omit<DefaultHeightmapResourceOpts, "url"> {
     urls: string[];
 }
 
