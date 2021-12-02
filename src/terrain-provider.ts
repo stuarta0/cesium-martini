@@ -14,7 +14,7 @@ import {
 } from "cesium";
 const ndarray = require("ndarray");
 
-import { TerrainWorkerInput } from "./worker/terrain.worker";
+import { TerrainWorkerInput } from "./worker/worker-util";
 import TilingScheme from "cesium/Source/Core/TilingScheme";
 import { HeightmapResource } from './resources/heightmap-resource';
 import WorkerFarmTerrainDecoder, { TerrainDecoder, DefaultTerrainDecoder } from "./worker/decoder";
