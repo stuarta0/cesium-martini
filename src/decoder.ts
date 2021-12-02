@@ -1,6 +1,6 @@
 import { HeightmapTerrainData, QuantizedMeshTerrainData } from "cesium";
 import { TileCoordinates } from "./terrain-provider";
-import { TerrainWorkerInput, decodeTerrain } from "./worker";
+import { TerrainWorkerInput } from "./terrain.worker";
 import WorkerFarm from "./worker-farm";
 import { QuantizedMeshResult } from "./worker-util";
 
@@ -24,7 +24,7 @@ export class DefaultTerrainDecoder implements TerrainDecoder {
     }
 
     decodeTerrain(params, data) {
-        return Promise.resolve(decodeTerrain(params, []));
+        return Promise.resolve(null);
     }
 }
 

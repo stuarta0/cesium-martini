@@ -15,7 +15,7 @@ import {
 const ndarray = require("ndarray");
 import Martini from "../martini/index.js";
 //import WorkerFarm from "./worker-farm";
-import { TerrainWorkerInput, decodeTerrain } from "./worker";
+import { TerrainWorkerInput } from "./terrain.worker";
 import TilingScheme from "cesium/Source/Core/TilingScheme";
 import { HeightmapResource } from './heightmap-resource';
 import MapboxTerrainResource, { MapboxTerrainResourceOpts } from "./mapbox-resource";
@@ -126,7 +126,7 @@ export class MartiniTerrainProvider<TerrainProvider> {
       px = undefined;
       return this.createQuantizedMeshData(tileRect, err, res);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       // return undefined
       const v = Math.max(32 - 4 * z, 4);
       return this.emptyHeightmap(v);

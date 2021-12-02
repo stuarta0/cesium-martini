@@ -1,4 +1,4 @@
-import TerrainWorker from "web-worker:./worker";
+import TerrainWorker from "./terrain.worker";
 
 const resolves = {};
 const rejects = {};

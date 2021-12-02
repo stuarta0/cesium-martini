@@ -1,10 +1,10 @@
 import {
   mapboxTerrainToGrid,
   createQuantizedMeshData,
-} from "../../dist";
+} from "../../src/worker-util";
 import ndarray from "ndarray";
 import Martini from "../../martini/index.js";
-import "regenerator-runtime";
+//import "regenerator-runtime";
 
 const ctx: Worker = self as any;
 

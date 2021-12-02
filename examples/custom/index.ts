@@ -5,13 +5,14 @@ import "./main.css";
 const Cesium = require("cesiumSource/Cesium");
 // Import @types/cesium to use along with CesiumJS
 import { Viewer, Ion, IonResource, createWorldTerrain } from "cesium";
-import { MartiniTerrainProvider, DefaultHeightmapResource, WorkerFarmTerrainDecoder } from "../../dist";
-import TerrariumWorker from "./mapzen.worker.ts";
+import { MartiniTerrainProvider, DefaultHeightmapResource, WorkerFarmTerrainDecoder } from "../../src";
+import TerrariumWorker from "./mapzen.worker";
 
 // Mapzen API discontinued, alternate source required
 const terrainResource = new DefaultHeightmapResource({
   //url: "https://tile.mapzen.com/mapzen/terrain/v1/terrarium/{z}/{x}/{y}.png?api_key=XXX",
-  url: "http://localhost:8080/public/terrain/{z}/{x}/{reverseY}.png",
+  //url: "http://localhost:8080/public/terrain1/{z}/{x}/{reverseY}.png",
+  url: "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png",
   skipOddLevels: false,
   maxZoom: 18,
 });
@@ -27,8 +28,6 @@ const terrainDecoder = new WorkerFarmTerrainDecoder({
 const terrainProvider = new MartiniTerrainProvider({
   resource: terrainResource,
   decoder: terrainDecoder,
-  requestVertexNormals: false,
-  requestWaterMask: false,
 });
 
 
@@ -68,9 +67,9 @@ var clat = -21.133786;
 var clon = 14.5481193;
 var zoom = 3000;
 
-clat = -20.5823678;
-clon = 117.1834165;
-zoom = 1000;
+// clat = -20.5823678;
+// clon = 117.1834165;
+// zoom = 1000;
 
 const rect = Cesium.Rectangle.fromDegrees(
   clon - 0.01,
