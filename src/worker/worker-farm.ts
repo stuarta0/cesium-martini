@@ -1,5 +1,3 @@
-import TerrainWorker from "./terrain.worker";
-
 const resolves = {};
 const rejects = {};
 let globalMsgId = 0; // Activate calculation in the worker, returning a promise
@@ -45,7 +43,7 @@ function handleMessage(msg) {
 class WorkerFarm {
   worker: Worker;
   constructor(opts) {
-    this.worker = opts.worker ?? new TerrainWorker();
+    this.worker = opts.worker;
     this.worker.onmessage = handleMessage;
   }
 

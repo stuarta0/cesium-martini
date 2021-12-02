@@ -1,9 +1,9 @@
 import {
-  mapboxTerrainToGrid,
+  rgbTerrainToGrid,
   createQuantizedMeshData,
-} from "../../src/worker-util";
+} from "../../src/worker/worker-util";
 import ndarray from "ndarray";
-import Martini from "../../martini/index.js";
+import Martini from "@mapbox/martini";
 //import "regenerator-runtime";
 
 const ctx: Worker = self as any;
@@ -25,7 +25,7 @@ function decodeTerrain(parameters) {
   // Tile size must be maintained through the life of the worker
   martini = martini ?? new Martini(tileSize + 1);
 
-  const terrain = mapboxTerrainToGrid(pixels, terrariumDecodeRgb);
+  const terrain = rgbTerrainToGrid(pixels, terrariumDecodeRgb);
 
   const tile = martini.createTile(terrain);
 

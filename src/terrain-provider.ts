@@ -13,13 +13,11 @@ import {
   Credit,
 } from "cesium";
 const ndarray = require("ndarray");
-import Martini from "../martini/index.js";
-//import WorkerFarm from "./worker-farm";
-import { TerrainWorkerInput } from "./terrain.worker";
+
+import { TerrainWorkerInput } from "./worker/terrain.worker";
 import TilingScheme from "cesium/Source/Core/TilingScheme";
-import { HeightmapResource } from './heightmap-resource';
-import MapboxTerrainResource, { MapboxTerrainResourceOpts } from "./mapbox-resource";
-import WorkerFarmTerrainDecoder, { TerrainDecoder, DefaultTerrainDecoder } from "./decoder";
+import { HeightmapResource } from './resources/heightmap-resource';
+import WorkerFarmTerrainDecoder, { TerrainDecoder, DefaultTerrainDecoder } from "./worker/decoder";
 
 // https://github.com/CesiumGS/cesium/blob/1.68/Source/Scene/MapboxImageryProvider.js#L42
 
@@ -29,7 +27,7 @@ export interface TileCoordinates {
   z: number;
 }
 
-interface MartiniTerrainOpts {
+export interface MartiniTerrainOpts {
   resource: HeightmapResource;
   decoder?: TerrainDecoder;
 
@@ -237,18 +235,5 @@ export class MartiniTerrainProvider<TerrainProvider> {
 
   getTileDataAvailable(x, y, z) {
     return this.resource.getTileDataAvailable({ x, y, z });
-  }
-}
-
-
-type MapboxTerrainOpts = Omit<MartiniTerrainOpts, 'resource'> & MapboxTerrainResourceOpts;
-
-export default class MapboxTerrainProvider extends MartiniTerrainProvider<TerrainProvider> {
-  constructor(opts: MapboxTerrainOpts = {}) {
-    const resource = new MapboxTerrainResource(opts);
-    super({
-      ...opts,
-      resource,
-    });
   }
 }

@@ -1,8 +1,7 @@
 import { HeightmapTerrainData, QuantizedMeshTerrainData } from "cesium";
-import { TileCoordinates } from "./terrain-provider";
-import { TerrainWorkerInput } from "./terrain.worker";
+import { TileCoordinates } from "../terrain-provider";
 import WorkerFarm from "./worker-farm";
-import { QuantizedMeshResult } from "./worker-util";
+import { TerrainWorkerInput, QuantizedMeshResult } from "./worker-util";
 
 
 export interface TerrainDecoder {
@@ -35,7 +34,7 @@ interface WorkerFarmDecoderOpts {
 }
 
 
-export default class WorkerFarmTerrainDecoder extends DefaultTerrainDecoder {
+export class WorkerFarmTerrainDecoder extends DefaultTerrainDecoder {
     farm: WorkerFarm;
 
     constructor(opts: WorkerFarmDecoderOpts) {
@@ -48,3 +47,5 @@ export default class WorkerFarmTerrainDecoder extends DefaultTerrainDecoder {
         return this.farm.scheduleTask(params, [data]) as Promise<QuantizedMeshResult>;
     }
 }
+
+export default WorkerFarmTerrainDecoder;

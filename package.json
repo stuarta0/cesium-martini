@@ -6,15 +6,16 @@
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -c -w",
-    "dev": "npm run watch & webpack-dev-server examples/simple/index.ts",
-    "dev:react": "npm run watch & webpack-dev-server examples/react/index.ts",
+    "dev": "webpack-dev-server examples/simple/index.ts",
+    "dev:react": "webpack-dev-server examples/react/index.ts",
+    "dev:custom": "webpack-dev-server examples/custom/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublish": "npm run build"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mapbox/martini": "^0.2.0",
+    "@mapbox/martini": "git://github.com/davenquinn/martini.git",
     "@types/ndarray": "^1.0.7",
     "axios": "^0.21.1",
     "cesium": "^1.81.0",
@@ -29,6 +30,7 @@
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-typescript": "^7.10.4",
     "@macrostrat/hyper": "^1.2.13",
+    "@open-wc/webpack-import-meta-loader": "^0.4.7",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^7.1.3",

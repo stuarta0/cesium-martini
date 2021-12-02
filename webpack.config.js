@@ -14,7 +14,8 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js"],
     alias: {
       // CesiumJS module name
-      cesiumSource: path.resolve(__dirname, cesiumSource)
+      cesiumSource: path.resolve(__dirname, cesiumSource),
+      lib: path.resolve(__dirname, 'src'),
     }
   },
   module: {

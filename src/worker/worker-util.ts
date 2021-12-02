@@ -2,21 +2,29 @@
 //const canvas = new OffscreenCanvas(256, 256);
 //const ctx = canvas.getContext("2d");
 
+export interface TerrainWorkerInput extends QuantizedMeshOptions {
+  imageData: Uint8ClampedArray;
+  maxLength: number | null;
+  x: number;
+  y: number;
+  z: number;
+}
+
 export type DecodeRgbFunction = (r: number, g: number, b: number, a: number) => number;
 
 /** Mapbox Terrain-RGB default decode function
 *  (r * 256 * 256) / 10 + (g * 256) / 10 + b / 10 - 10000
 */
-const defaultDecodeRgb: DecodeRgbFunction = (r, g, b, a) => (r * 6553.6) + (g * 25.6) + b * 0.1 - 10000;
+const defaultMapboxDecodeRgb: DecodeRgbFunction = (r, g, b, a) => (r * 6553.6) + (g * 25.6) + b * 0.1 - 10000;
 
-function mapboxTerrainToGrid(png: ndarray<number>, decodeRgb?: DecodeRgbFunction) {
+function rgbTerrainToGrid(png: ndarray<number>, decodeRgb?: DecodeRgbFunction) {
   // maybe we should do this on the GPU using REGL?
   // but that would require GPU -> CPU -> GPU
   const gridSize = png.shape[0] + 1;
   const terrain = new Float32Array(gridSize * gridSize);
   const tileSize = png.shape[0];
 
-  const decode = decodeRgb ?? defaultDecodeRgb;
+  const decode = decodeRgb ?? defaultMapboxDecodeRgb;
 
   // decode terrain values
   for (let y = 0; y < tileSize; y++) {
@@ -141,4 +149,4 @@ function createQuantizedMeshData(tile, mesh, tileSize): QuantizedMeshResult {
   };
 }
 
-export { mapboxTerrainToGrid, createQuantizedMeshData };
+export { rgbTerrainToGrid, createQuantizedMeshData };

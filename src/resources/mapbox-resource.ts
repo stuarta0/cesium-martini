@@ -1,7 +1,7 @@
 import { Resource } from "cesium";
 import Credit from "cesium/Source/Core/Credit";
 import { DefaultHeightmapResource, DefaultHeightmapResourceOpts } from "./heightmap-resource";
-import { TileCoordinates } from "./terrain-provider";
+import { TileCoordinates } from "../terrain-provider";
 
 export enum ImageFormat {
   WEBP = "webp",

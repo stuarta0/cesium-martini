@@ -5,7 +5,9 @@ import "./main.css";
 const Cesium = require("cesiumSource/Cesium");
 // Import @types/cesium to use along with CesiumJS
 import { Viewer, Ion, IonResource, createWorldTerrain } from "cesium";
-import { MartiniTerrainProvider, DefaultHeightmapResource, WorkerFarmTerrainDecoder } from "../../src";
+import { MartiniTerrainProvider } from "lib/terrain-provider";
+import { DefaultHeightmapResource } from "lib/resources/heightmap-resource";
+import { WorkerFarmTerrainDecoder } from "lib/worker/decoder";
 import TerrariumWorker from "./mapzen.worker";
 
 // Mapzen API discontinued, alternate source required
@@ -14,7 +16,7 @@ const terrainResource = new DefaultHeightmapResource({
   //url: "http://localhost:8080/public/terrain1/{z}/{x}/{reverseY}.png",
   url: "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png",
   skipOddLevels: false,
-  maxZoom: 18,
+  maxZoom: 15,
 });
 
 // Terrarium format utilises a different encoding scheme to Mapbox Terrain-RGB
