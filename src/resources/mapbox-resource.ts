@@ -1,7 +1,6 @@
 import { Resource } from "cesium";
 import Credit from "cesium/Source/Core/Credit";
 import { DefaultHeightmapResource, DefaultHeightmapResourceOpts } from "./heightmap-resource";
-import { TileCoordinates } from "../terrain-provider";
 
 export enum ImageFormat {
   WEBP = "webp",
@@ -33,7 +32,7 @@ export class MapboxTerrainResource extends DefaultHeightmapResource {
         this.tileSize = 512;
       }
     }
-    
+
     this.resource = Resource.createIfNeeded(`https://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}${highResolution ? "@2x" : ""}.${format}`);
     if (opts.accessToken) {
       this.resource.setQueryParameters({

@@ -1,5 +1,5 @@
 import { Resource, Credit } from "cesium";
-import { TileCoordinates } from "./terrain-provider";
+import { TileCoordinates } from "../terrain-provider";
 
 export interface HeightmapResource {
   credit?: Credit;

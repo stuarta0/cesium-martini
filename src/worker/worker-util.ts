@@ -1,6 +1,7 @@
 // We should save these
 //const canvas = new OffscreenCanvas(256, 256);
 //const ctx = canvas.getContext("2d");
+import ndarray from "ndarray";
 
 export interface TerrainWorkerInput extends QuantizedMeshOptions {
   imageData: Uint8ClampedArray;
